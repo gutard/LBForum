@@ -77,12 +77,12 @@ def markitup_preview(request, template_name="lbforum/markitup_preview.html"):
 def new_post(request, forum_id=None, topic_id=None, form_class=NewPostForm,
         template_name='lbforum/post.html'):
     qpost = topic = forum = first_post = preview = None
-    post_type = _('topic')
+    is_reply = False
     topic_post = True
     if forum_id:
         forum = get_object_or_404(Forum, pk=forum_id)
     if topic_id:
-        post_type = _('reply')
+        is_reply = True
         topic_post = False
         topic = get_object_or_404(Topic, pk=topic_id)
         forum = topic.forum
@@ -111,7 +111,7 @@ def new_post(request, forum_id=None, topic_id=None, form_class=NewPostForm,
         'form': form,
         'topic': topic,
         'first_post': first_post,
-        'post_type': post_type,
+        'is_reply': is_reply,
         'preview': preview
     }
     ext_ctx['unpublished_attachments'] = request.user.attachment_set.filter(activated=False)
@@ -125,12 +125,12 @@ def new_post(request, forum_id=None, topic_id=None, form_class=NewPostForm,
 def edit_post(request, post_id, form_class=EditPostForm,
               template_name="lbforum/post.html"):
     preview = None
-    post_type = _('reply')
+    is_reply = True
     edit_post = get_object_or_404(Post, id=post_id)
     if not (request.user.is_staff or request.user == edit_post.posted_by):
         return HttpResponse(ugettext('no right'))
     if edit_post.topic_post:
-        post_type = _('topic')
+        is_reply = False
     if request.method == "POST":
         form = form_class(instance=edit_post, user=request.user,
                           data=request.POST)
@@ -145,7 +145,7 @@ def edit_post(request, post_id, form_class=EditPostForm,
         'post': edit_post,
         'topic': edit_post.topic,
         'forum': edit_post.topic.forum,
-        'post_type': post_type,
+        'is_reply': is_reply,
         'preview': preview
     }
     ext_ctx['unpublished_attachments'] = request.user.attachment_set.filter(activated=False)

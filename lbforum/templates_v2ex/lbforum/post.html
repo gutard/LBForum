@@ -44,7 +44,7 @@
                 <a href="{{ topic.get_absolute_url }}">{{ topic.subject }}</a>
                 {% endif %}
                 <span> &raquo; </span>
-                {% if is_new_post %}{% trans "Post new" %}{% else %}{% trans "Edit" %}{% endif %} {{ post_type }}
+                {% if is_new_post %}{% if is_reply %}{% trans "Post new reply" %}{% else %}{% trans "Post new topic" %}{% endif %}{% else %}{% if is_reply %}{% trans "Edit reply" %}{% else %}{% trans "Edit topic" %}{% endif %}{% endif %}
             </span> 
         </div>
         {% if preview %}
